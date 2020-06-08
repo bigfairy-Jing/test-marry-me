@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>for_my_heart</title>
+  <script src="./jquery.js"></script>
+  <script type="text/javascript" src="swipe.js"></script> <!--引入外部swipe-->
+  <script type="text/javascript" src="trainstion.js"></script> <!--外部引入插件实现人物走动-->
+  <script type="text/javascript" src="./BoyWalk.js"></script>
+  <link rel="stylesheet" href="./rest.css"/>
+  <link rel="stylesheet" href="./main.css"/>
+  <link rel="stylesheet" href="./pageB.css"/>  <!--引入第二张图片的样式-->
+  <link rel="stylesheet" href="./pageC.css"/>
+  <style type="text/css">
+    /*pageA*/
+    /*背景图*/
+
+    .a_background {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+    }
+
+    .a_background_top{
+      width: 100%;
+      height: 71.6%;
+      background-image: url("./images/page1.png");
+      background-size: 100% 100%;
+    }
+
+
+    .a_background_middle{
+      width: 100%;
+      height: 13.1%;
+      background-image: url("http://img.mukewang.com/55addf800001ff2e14410118.png");
+      background-size: 100% 100%;
+    }
+
+    .a_background_botton{
+      width: 100%;
+      height: 15.3%;
+      background-image: url("http://img.mukewang.com/55addfcb000189b314410138.png");
+      background-size: 100% 100%;
+    }
+    /*人物慢行*/
+    .slowWalk {
+      /* 填入动画样式规则 */
+      animation: person-slow 500ms infinite steps(1, start);
+    }
+    /*人物暂停*/
+    .pauseWalk {
+      -webkit-animation-play-state: paused;
+      -moz-animation-play-state: paused;
+    }
+
+    /*慢走的动画*/
+    @-webkit-keyframes person-slow {
+      0% {
+        background-position: -0px -291px;
+      }
+      25% {
+        background-position: -602px -0px;
+      }
+      50% {
+        background-position: -302px -291px;
+      }
+      75% {
+        background-position: -151px -291px;
+      }
+      100% {
+        background-position: -0px -291px;
+      }
+    }
+    @-moz-keyframes person-slow {
+      0% {
+        background-position: -0px -291px;
+      }
+      25% {
+        background-position: -602px -0px;
+      }
+      50% {
+        background-position: -302px -291px;
+      }
+      75% {
+        background-position: -151px -291px;
+      }
+      100% {
+        background-position: -0px -291px;
+      }
+    }
+
+
+
+  </style>
+</head>
+<body>
+<div id="content">
+  <!--三个轮番页面-->
+  <ul class="content-wrap">
+    <!--第一幅画面-->
+    <li>
+      <div class="a_background">
+        <div class="a_background_top"></div>
+        <div class="a_background_middle"></div>
+        <div class="a_background_botton"></div>
+      </div>
+      <!--太阳-->
+      <div id="sun"></div>
+      <!--云动画-->
+      <div class="cloudArea">
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+      </div>
+    </li>
+    <!-- 第二副画面 -->
+    <li>
+      <!-- 背景图 -->
+      <div class="b_background"></div>
+      <div class="b_background_preload"></div>
+      <!-- 商店 -->
+      <div class="shop">
+        <div class="door">
+          <div class="door-left"></div>
+          <div class="door-right"></div>
+        </div>
+        <!-- 灯 -->
+        <div class="lamp"></div>
+      </div>
+      <!-- 鸟 -->
+      <div class="bird"></div>
+    </li>
+    <!-- 第三副画面 -->
+    <li>
+      <!-- 背景图 -->
+      <div class="c_background">
+        <div class="c_background_top"></div>
+        <div class="c_background_middle"></div>
+        <div class="c_background_botton"></div>
+      </div>
+      <!-- 小女孩 -->
+      <div class="girl"></div>
+      <!-- 水波 -->
+      <div class="bridge-bottom">
+        <div class="water">
+          <div id="water1" class="water_1"></div>
+          <div id="water2" class="water_2"></div>
+          <div id="water3" class="water_3"></div>
+          <div id="water4" class="water_4"></div>
+        </div>
+      </div>
+      <!-- 星星 -->
+      <ul class="stars">
+        <li class="stars1 li-star"></li>
+        <li class="stars2 li-star"></li>
+        <li class="stars3 li-star"></li>
+        <li class="stars4 li-star"></li>
+        <li class="stars5 li-star"></li>
+        <li class="stars6 li-star"></li>
+      </ul>
+      <!-- 520logo -->
+      <div class="logo"></div>
+    </li>
+  </ul>
+  <!--小男孩 -->
+  <div id="boy" class="charector"></div>
+  <!-- 飘花 -->
+  <div id="snowflake"></div>
+  <!--<div class="button">-->
+    <!--<button>开始</button>-->
+    <!--<button>暂停</button>-->
+  <!--</div>-->
+  <div class="button">
+    <div class=""></div>
+  </div>
+</div>
+
+
+</body>
+<script type="text/javascript">
+    $(function () {
+      var container = $("#content")
+      var swipe = Swipe(container)
+
+      // 页面滚动到指定的位置
+      function scrollTo(time, proportionX) {
+        var distX = $("#content").width() * proportionX;
+        swipe.scrollTo(distX, time);
+      }
+      // +++++++++++++++++++动画处理++++++++++++++
+      var boy = BoyWalk();
+      //用来临时调整页面
+      // swipe.scrollTo(container.width()*2, 0);
+
+      //++++++++++++++++++小女孩的位置和转身动作+++++++++++
+          //提前数据处理
+          var visualWidth = container.width();
+          var visualHeight = container.height();
+          var bridgeY = boy.bridgeY;
+      var girl = {
+        elem: $('.girl'),
+        getHeight: function() {
+          return this.elem.height();
+        },
+        // 转身动作
+        rotate: function() {
+          this.elem.addClass('girl-rotate');
+        },
+        setOffset: function() {
+          this.elem.css({
+            left: visualWidth / 2,
+            top: bridgeY - this.getHeight()
+          });
+        },
+        getOffset: function() {
+          return this.elem.offset();
+        },
+        getWidth: function() {
+          return this.elem.width();
+        }
+      };
+      // 修正小女孩位置
+      girl.setOffset();
+      //loge动画 //
+      ///////////
+      var logo = {
+        elem: $('.logo'),
+        run: function() {
+          this.elem.addClass('logolightSpeedIn')
+            .on(boy.animationEnd, function() {
+              $(this).addClass('logoshake').off();
+            });
+        }
+      };
+
+
+      // 背景音乐
+
+      // 音乐配置
+      var audioConfig = {
+        enable: true, // 是否开启音乐
+        playURl: './music/begin.mp3', // 正常播放地址
+        cycleURL: './music/circulation.wav' // 正常循环播放地址
+      };
+
+      function Hmlt5Audio(url, isloop) {
+        var audio = new Audio(url);
+        audio.autoPlay = true;
+        audio.loop = isloop || false;
+        audio.play();
+        return {
+          end: function(callback) {
+            audio.addEventListener('ended', function() {
+              callback();
+            }, false);
+          }
+        };
+      }
+      var audio1 = Hmlt5Audio(audioConfig.playURl);
+      audio1.end(function() {
+        Hmlt5Audio(audioConfig.cycleURL, true);
+      });
+
+
+      //第三页
+      $("button:first").click(function() {
+        snowflake()
+        // 第一次走路到桥底边left,top
+
+      })
+
+
+
+      //+++飞鸟+++++
+      var bird = {
+        elem: $(".bird"),
+        fly: function() {
+          this.elem.addClass('birdFly')
+          this.elem.transition({
+            right: container.width()
+          }, 15000, 'linear');
+        }
+      };
+
+      //第二页
+      function startRun1() {
+
+        boy.walkTo(2000, 0.5)
+          .then(function() {
+            //暂停走路
+            boy.stopWalk()
+          })
+          .then(function() {
+            //开门
+            return openDoor();
+          })
+          .then(function() {
+            //开灯
+            lamp.bright()
+          })
+          .then(function() {
+            //进商店
+            return boy.toShop(2000)
+          }).then(function(){
+          // 取花
+          return boy.talkFlower();
+        }).then(
+         bird.fly()
+        ).then(function() {
+          //出商店
+          return boy.outShop(2000)
+        }).then(function() {
+          //灯暗
+          lamp.dark()
+        });
+      }
+
+
+      // 开始
+      // $("button:first").click(startRun);
+
+
+
+      var snowflakeURl = [
+        './images/huaban.png',
+        './images/huaban.png',
+        './images/huaban.png',
+        './images/huaban.png',
+        './images/huaban.png',
+        './images/huaban.png',
+        './images/huaban.png',
+        './images/huaban.png',
+      ]
+
+      ///////
+      //飘雪花 //
+      ///////
+      function snowflake() {
+        // 雪花容器
+        var $flakeContainer = $('#snowflake');
+
+        // 随机六张图
+        function getImagesName() {
+          return snowflakeURl[[Math.floor(Math.random() * 6)]];
+        }
+
+        // 创建一个雪花元素
+        function createSnowBox() {
+          var url = getImagesName();
+          return $('<div class="snowbox" />').css({
+            'width': 41,
+            'height': 41,
+            'position': 'absolute',
+            'backgroundSize': 'cover',
+            'zIndex': 100000,
+            'top': '-41px',
+            'backgroundImage': 'url(' + url + ')'
+          }).addClass('snowRoll');
+        }
+
+        // 开始飘花
+        setInterval(function () {
+          // 运动的轨迹
+          var startPositionLeft = Math.random() * visualWidth - 100,
+            startOpacity = 1,
+            endPositionTop = visualHeight - 40,
+            endPositionLeft = startPositionLeft - 100 + Math.random() * 500,
+            duration = visualHeight * 10 + Math.random() * 5000;
+
+          // 随机透明度，不小于0.5
+          var randomStart = Math.random();
+          randomStart = randomStart < 0.5 ? startOpacity : randomStart;
+
+          // 创建一个雪花
+          var $flake = createSnowBox();
+
+          // 设计起点位置
+          $flake.css({
+            left: startPositionLeft,
+            opacity: randomStart
+          });
+
+          // 加入到容器
+          $flakeContainer.append($flake);
+
+          // 开始执行动画
+          $flake.transition({
+            top: endPositionTop,
+            left: endPositionLeft,
+            opacity: 0.7
+          }, duration, 'ease-out', function () {
+            $(this).remove() //结束后删除
+          });
+        }, 100);
+      }
+
+
+      // 灯动画 //
+      ///////////
+      var lamp = {
+        elem: $('.b_background'),
+        bright: function() {
+          this.elem.addClass('lamp-bright')
+        },
+        dark: function() {
+          this.elem.removeClass('lamp-bright')
+        }
+      };
+      //开关门处理
+      function doorAction(left, right, time) {
+        var $door = $('.door');
+        var doorLeft = $('.door-left');
+        var doorRight = $('.door-right');
+        var defer = $.Deferred();
+        var count = 2;
+        // 等待开门完成
+        var complete = function () {
+          if (count == 1) {
+            defer.resolve();
+            return;
+          }
+          count--;
+        };
+        doorLeft.transition({
+          'left': left
+        }, time, complete);
+
+        doorRight.transition({
+          'left': right
+        }, time, complete);
+        return defer;
+      }
+      // 开门
+      function openDoor() {
+        return doorAction('-50%', '100%', 2000);
+      }
+      // 关门
+      function shutDoor() {
+        return doorAction('0%', '50%', 2000);
+      }
+      // // 开门
+      // $("button:first").click(function() {
+      //   openDoor().then(function() {
+      //     // 开灯
+      //     lamp.bright();
+      //   });
+      // });
+      // // 关门
+      // $("button:last").click(function() {
+      //   shutDoor().then(function () {
+      //     lamp.dark();
+      //   });
+      // });
+
+
+      //正式开始的代码
+
+      function startRun(){
+          //太阳公转
+          $('#sun').addClass('rotation')
+          // 飘云
+          $(".cloud:first").addClass('cloud1Anim');
+          $(".cloud:last").addClass('cloud2Anim');
+
+
+          // 开始第一次走路
+          boy.walkTo(5000, 0.2)
+            .then(function() {
+              //第一次走路完成
+              scrollTo(20000,1)
+            }).then(function () {
+              boy.walkTo(20000, 0.5)
+                .then(function () {
+                  boy.stopWalk()
+                }).then(function() {
+                //开门
+                return openDoor();
+              })
+                .then(function() {
+                  //开灯
+                  lamp.bright()
+                })
+                .then(function() {
+                  //进商店
+                  return boy.toShop(2000)
+                }).then(function(){
+                // 取花
+                return boy.talkFlower();
+              }).then(
+                bird.fly()
+              ).then(function() {
+                //出商店
+                return boy.outShop(2000)
+              }).then(function () {
+                return shutDoor()
+              })
+                .then(function() {
+                //灯暗
+                lamp.dark()
+              }).then(function () {
+                scrollTo(10000,2)
+                boy.walkTo(10000, 0.18).then(function() {
+                  // 第二次走路到桥上left,top
+                  return boy.walkTo(1500, 0.25, (bridgeY - girl.getHeight()) / visualHeight);
+                })
+                  .then(function() {
+                    // 实际走路的比例
+                    var proportionX = (girl.getOffset().left - boy.getWidth() + girl.getWidth() / 5) / visualWidth;
+                    // 第三次桥上直走到小女孩面前
+                    return boy.walkTo(1500, proportionX-0.03);
+                  }).then(function() {
+                  // 图片还原原地停止状态
+                  boy.resetOriginal();
+                }).then(function () {
+                  //花瓣掉落
+                  snowflake();
+                  // 增加转身动作
+                  setTimeout(function() {
+                    girl.rotate();
+                    boy.rotate(function() {
+                      // 开始logo动画
+                      logo.run();
+                    });
+                  }, 1000);
+                });
+
+              });
+
+          })
+
+      }
+      setTimeout(function () {
+        startRun()
+      },1000)
+
+
+    })
+</script>
+<!--<script type="text/javascript">-->
+  <!--//处理页面滑动-->
+  <!--var swipe = Swipe($('#content'));-->
+
+  <!--//数据获取，这里是获取页面中任意一个元素的高度和top值-->
+  <!--var getValue = function(className) {-->
+    <!--var $elem = $('' + className + '');-->
+    <!--// 走路的路线坐标-->
+    <!--return {-->
+      <!--height: $elem.height(),-->
+      <!--top: $elem.position().top-->
+    <!--};-->
+  <!--};-->
+
+  <!--// 路的中心轴-->
+  <!--var pathY = function() {-->
+    <!--var data = getValue('.a_background_middle');-->
+    <!--return data.top + data.height / 2;-->
+  <!--}();-->
+
+  <!--//计算小男孩的偏移量,路的中心点 - 小男孩的高度-->
+  <!--var $boy = $("#boy");-->
+  <!--var boyHeight = $boy.height();-->
+  <!--$boy.css({-->
+    <!--top: pathY - boyHeight + 25-->
+  <!--});-->
+
+  <!--// 绑定一个事件，触发通过-->
+  <!--// $('button').click(function() {-->
+  <!--//   swipe.scrollTo($("#content").width() * 2, 5000);-->
+  <!--// });-->
+
+  <!--// 开始-->
+  <!--$("button:first").click(function() {-->
+
+
+    <!--swipe.scrollTo($("#content").width() * 2, 5000);-->
+    <!--$boy.addClass('slowWalk').transition({-->
+      <!--'left': $("#content").width() + 'px',-->
+    <!--}, 10000);-->
+  <!--});-->
+
+  <!--// 暂停-->
+  <!--$("button:last").click(function() {-->
+    <!--var left = $boy.css('left');-->
+    <!--// 强制做了一个改变目标left的处理-->
+    <!--// 动画是要运行10秒,所以此时动画还是没有结束的-->
+    <!--$boy.css('left',left);-->
+    <!--// 增加暂停的样式-->
+    <!--$boy.addClass('pauseWalk')-->
+  <!--});-->
+
+
+  <!--//++++++++++++++++++++++动画处理+++++++++++++++++++-->
+  <!--//页面可shi区域-->
+  <!--var visualWidth = $('#content').width();-->
+  <!--var visualHeight = $('#content').height();-->
+
+  <!--// 恢复走路-->
+  <!--function restoreWalk() {-->
+    <!--$boy.removeClass('pauseWalk');-->
+  <!--}-->
+  <!--// css3的动作变化-->
+  <!--function slowWalk() {-->
+    <!--$boy.addClass('slowWalk');-->
+  <!--}-->
+
+  <!--//计算移动的距离-->
+  <!--function calculateDist(direction, proportion) {-->
+    <!--return (direction == "x" ?-->
+      <!--visualWidth : visualHeight) * proportion;-->
+  <!--}-->
+
+  <!--// 用transition做运动 options 位置配置  runTime 运动时间-->
+  <!--function stratRun(options, runTime) {-->
+    <!--var dfdPlay = $.Deferred();-->
+    <!--// 恢复走路-->
+    <!--restoreWalk();-->
+    <!--// 运动的属性-->
+    <!--$boy.transition(-->
+      <!--options,-->
+      <!--runTime,-->
+      <!--'linear',-->
+      <!--function() {});-->
+    <!--return dfdPlay;-->
+  <!--}-->
+  <!--// 开始走路-->
+  <!--function walkRun(time, dist, disY) {-->
+    <!--time = time || 3000;-->
+    <!--// 脚动作-->
+    <!--slowWalk();-->
+    <!--// 开始走路-->
+    <!--var d1 = stratRun({-->
+      <!--'left': dist + 'px',-->
+      <!--'top': disY ? disY : undefined-->
+    <!--}, time);-->
+    <!--return d1;-->
+  <!--}-->
+
+  <!--/*var wraDom = document.querySelector('.wrapper');*/-->
+<!--</script>-->
+</html>
